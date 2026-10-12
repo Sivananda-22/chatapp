@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="chat-container">
+
+        <h1>Chat Room</h1>
+
+        <p>Logged in as <strong>{{ username }}</strong></p>
+
+        <!-- Messages will appear here -->
+        <div id="messages" aria-live="polite"></div>
+
+        <!-- Form for sending messages -->
+        <form action="/send_message" method="POST" class="chat-form">
+            <input
+                type="text"
+                name="message"
+                placeholder="Type your message..."
+                maxlength="1000"
+                required
+            >
+
+            <button type="submit">Send</button>
+        </form>
+
+        <!-- Logout link -->
+        <a href="/logout" class="logout">Logout</a>
+
+    </div>
+
+    <script>
+        async function loadMessages() {
+            try {
+                const response = await fetch("/get_messages");
+
+                if (!response.ok) {
+                    return;
+                }
+
+                const messages = await response.json();
+                const container = document.getElementById("messages");
+
+                const wasAtBottom =
+                    container.scrollTop + container.clientHeight >=
+                    container.scrollHeight - 20;
+
+                container.replaceChildren();
+
+                messages.forEach(function (item) {
+                    const messageDiv = document.createElement("div");
+                    messageDiv.className = "message";
+
+                    const sender = document.createElement("strong");
+                    sender.textContent = item.username + ": ";
+
+                    const content = document.createElement("span");
+                    content.textContent = item.message;
+
+                    messageDiv.append(sender, content);
+                    container.appendChild(messageDiv);
+                });
+
+                if (wasAtBottom) {
+                    container.scrollTop = container.scrollHeight;
+                }
+
+            } catch (error) {
+                console.error("Could not load messages:", error);
+            }
+        }
+
+        // Load messages when the page opens
+        loadMessages();
+
+        // Refresh messages every two seconds
+        setInterval(loadMessages, 2000);
+    </script>
+</body>
+</html>
