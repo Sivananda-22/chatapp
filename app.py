@@ -179,7 +179,9 @@ def logout():
     return redirect(url_for("home"))
 
 
+# Initialize database tables when the app starts
+init_db()
+init_messages_table()
+
 if __name__ == "__main__":
-    init_db()
-    init_messages_table()
     app.run(debug=False)
