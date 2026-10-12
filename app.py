@@ -13,7 +13,11 @@ from flask import (
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from database import get_db_connection, init_messages_table
+from database import (
+    get_db_connection,
+    init_users_table,
+    init_messages_table,
+)
 
 app = Flask(__name__)
 
@@ -25,19 +29,7 @@ app.secret_key = os.environ.get(
 
 
 def init_db():
-    """Create the users table if it does not exist."""
-    connection = get_db_connection()
-
-    connection.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL
-        )
-    """)
-
-    connection.commit()
-    connection.close()
+    init_users_table()
 
 
 @app.route("/")
